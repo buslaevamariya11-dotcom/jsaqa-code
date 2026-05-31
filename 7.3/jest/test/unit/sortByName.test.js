@@ -14,4 +14,16 @@ describe("Books names test suit", () => {
       "Гарри Поттер",
     ]);
   });
+
+  it("Books names should not change order if names are equal", () => {
+    expect(
+      sorting.sortByName([
+        "Гарри Поттер",
+        "Гарри Поттер",
+      ])
+    ).toEqual([
+      "Гарри Поттер",
+      "Гарри Поттер",
+    ]);
+  });
 });
