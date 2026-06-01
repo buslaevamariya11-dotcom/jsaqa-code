@@ -1,55 +1,78 @@
-const { clickElement, putText, getText } = require("./lib/commands.js");
-const { generateName } = require("./lib/util.js");
+const {
+  openSession,
+  selectAvailableSeats,
+  bookSelectedSeats,
+  isBookingButtonDisabled,
+  getText,
+} = require('./lib/commands');
+
+const appUrl = 'https://qamid.tmweb.ru/client/index.php';
 
 let page;
 
 beforeEach(async () => {
   page = await browser.newPage();
-  await page.setDefaultNavigationTimeout(0);
-});
 
-afterEach(() => {
-  page.close();
-});
-
-describe("Netology.ru tests", () => {
-  beforeEach(async () => {
-    page = await browser.newPage();
-    await page.goto("https://netology.ru");
-  });
-
-  test("The first test'", async () => {
-    const title = await page.title();
-    console.log("Page title: " + title);
-    await clickElement(page, "header a + a");
-    const title2 = await page.title();
-    console.log("Page title: " + title2);
-    const pageList = await browser.newPage();
-    await pageList.goto("https://netology.ru/navigation");
-    await pageList.waitForSelector("h1");
-  });
-
-  test("The first link text 'Медиа Нетологии'", async () => {
-    const actual = await getText(page, "header a + a");
-    expect(actual).toContain("Медиа Нетологии");
-  });
-
-  test("The first link leads on 'Медиа' page", async () => {
-    await clickElement(page, "header a + a");
-    const actual = await getText(page, ".logo__media");
-    await expect(actual).toContain("Медиа");
+  await page.goto(appUrl, {
+    waitUntil: 'domcontentloaded',
   });
 });
 
-test("Should look for a course", async () => {
-  await page.goto("https://netology.ru/navigation");
-  await putText(page, "input", "тестировщик");
-  const actual = await page.$eval("a[data-name]", (link) => link.textContent);
-  const expected = "Тестировщик ПО";
-  expect(actual).toContain(expected);
+afterEach(async () => {
+  await page.close();
 });
 
-test("Should show warning if login is not email", async () => {
-  await page.goto("https://netology.ru/?modal=sign_in");
-  await putText(page, 'input[type="email"]', generateName(5));
+describe('Ticket booking tests', () => {
+  test(
+    'Happy path: should book one available seat',
+    async () => {
+      // Arrange
+      await openSession(page);
+
+      // Act
+      await selectAvailableSeats(page, 1);
+      await bookSelectedSeats(page);
+
+      // Assert
+      const title = await getText(page, '.ticket__check-title');
+
+      expect(title).toContain('Вы выбрали билеты');
+    },
+    40000
+  );
+
+  test(
+    'Happy path: should book two available seats',
+    async () => {
+      // Arrange
+      await openSession(page);
+
+      // Act
+      await selectAvailableSeats(page, 2);
+      await bookSelectedSeats(page);
+
+      // Assert
+      const title = await getText(page, '.ticket__check-title');
+      const seats = await getText(page, '.ticket__chairs');
+
+      expect(title).toContain('Вы выбрали билеты');
+      expect(seats.length).toBeGreaterThan(0);
+    },
+    40000
+  );
+
+  test(
+    'Sad path: should not allow booking without selected seats',
+    async () => {
+      // Arrange
+      await openSession(page);
+
+      // Act
+      const isDisabled = await isBookingButtonDisabled(page);
+
+      // Assert
+      expect(isDisabled).toBe(true);
+    },
+    40000
+  );
 });

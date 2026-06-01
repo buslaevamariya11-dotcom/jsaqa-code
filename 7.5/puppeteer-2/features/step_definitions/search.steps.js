@@ -1,34 +1,77 @@
-const puppeteer = require("puppeteer");
-const chai = require("chai");
-const expect = chai.expect;
-const { Given, When, Then, Before, After } = require("cucumber");
-const { putText, getText } = require("../../lib/commands.js");
+const puppeteer = require('puppeteer');
+const { Given, When, Then, After, setDefaultTimeout } = require('cucumber');
+const { expect } = require('chai');
 
-Before(async function () {
-  const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
-  const page = await browser.newPage();
-  this.browser = browser;
-  this.page = page;
-});
+const {
+  openSession,
+  selectAvailableSeats,
+  bookSelectedSeats,
+  isBookingButtonDisabled,
+  getText,
+} = require('../../lib/commands');
 
-After(async function () {
-  if (this.browser) {
-    await this.browser.close();
-  }
-});
+const appUrl = 'https://qamid.tmweb.ru/client/index.php';
 
-Given("user is on {string} page", async function (string) {
-  return await this.page.goto(`https://netology.ru${string}`, {
-    setTimeout: 20000,
+let browser;
+let page;
+
+setDefaultTimeout(40000);
+
+Given('пользователь открыл главную страницу кинотеатра', async () => {
+  browser = await puppeteer.launch({
+    headless: false,
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    defaultViewport: null,
+    args: ['--start-maximized'],
+  });
+
+  page = await browser.newPage();
+
+  await page.goto(appUrl, {
+    waitUntil: 'domcontentloaded',
   });
 });
 
-When("user search by {string}", async function (string) {
-  return await putText(this.page, "input", string);
+When('пользователь открывает доступный сеанс', async () => {
+  await openSession(page);
 });
 
-Then("user sees the course suggested {string}", async function (string) {
-  const actual = await getText(this.page, "a[data-name]");
-  const expected = await string;
-  expect(actual).contains(expected);
+When('пользователь выбирает {int} место', async (count) => {
+  await selectAvailableSeats(page, count);
+});
+
+When('пользователь выбирает {int} места', async (count) => {
+  await selectAvailableSeats(page, count);
+});
+
+When('пользователь бронирует выбранные места', async () => {
+  await bookSelectedSeats(page);
+});
+
+Then('пользователь видит подтверждение бронирования', async () => {
+  const title = await getText(page, '.ticket__check-title');
+
+  expect(title).to.contain('Вы выбрали билеты');
+});
+
+Then('пользователь видит информацию о выбранных местах', async () => {
+  const seats = await getText(page, '.ticket__chairs');
+
+  expect(seats.length).to.be.greaterThan(0);
+});
+
+Then('кнопка бронирования неактивна', async () => {
+  const isDisabled = await isBookingButtonDisabled(page);
+
+  expect(isDisabled).to.equal(true);
+});
+
+After(async () => {
+  if (page) {
+    await page.close();
+  }
+
+  if (browser) {
+    await browser.close();
+  }
 });
