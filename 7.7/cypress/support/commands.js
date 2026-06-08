@@ -1,25 +1,25 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add('openClientPage', () => {
+  cy.fixture('urls').then((urls) => {
+    cy.visit(urls.client);
+  });
+});
+
+Cypress.Commands.add('openAdminPage', () => {
+  cy.fixture('urls').then((urls) => {
+    cy.visit(urls.admin);
+  });
+});
+
+Cypress.Commands.add('loginToAdmin', (email, password) => {
+  cy.fixture('selectors').then((selectors) => {
+    cy.get(selectors.admin.email).type(email);
+    cy.get(selectors.admin.password).type(password);
+    cy.get(selectors.admin.loginButton).click();
+  });
+});
+
+Cypress.Commands.add('chooseAvailableSeat', () => {
+  cy.fixture('selectors').then((selectors) => {
+    cy.get(selectors.hall.availableSeat).first().click();
+  });
+});

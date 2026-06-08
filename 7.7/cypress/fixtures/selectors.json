@@ -1,0 +1,21 @@
+{
+  "main": {
+    "day": ".page-nav__day",
+    "movie": ".movie",
+    "movieTitle": ".movie__title",
+    "seanceTime": ".movie-seances__time"
+  },
+  "hall": {
+    "availableSeat": ".buying-scheme__chair_standart:not(.buying-scheme__chair_taken), .buying-scheme__chair_vip:not(.buying-scheme__chair_taken)",
+    "acceptButton": ".acceptin-button"
+  },
+  "booking": {
+    "selectedTicketsText": "Вы выбрали билеты:"
+  },
+  "admin": {
+    "email": "[name='email']",
+    "password": "[name='password']",
+    "loginButton": ".login__button",
+    "movieTitle": ".conf-step__movie-title"
+  }
+}
