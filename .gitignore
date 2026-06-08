@@ -1,3 +1,7 @@
 test-results/
 test-results/
 playwright-report/
+
+node_modules/
+
+7.7-api/node_modules/
