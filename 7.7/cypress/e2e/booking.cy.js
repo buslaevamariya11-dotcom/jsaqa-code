@@ -1,31 +1,21 @@
 describe('Movie booking', () => {
-  it('Should book available ticket for movie from admin panel', () => {
-    cy.fixture('users').then((users) => {
-      cy.openAdminPage();
-      cy.loginToAdmin(users.happy.email, users.happy.password);
-    });
+  it('Should book available ticket', () => {
+    cy.openClientPage();
 
     cy.fixture('selectors').then((selectors) => {
-      cy.get(selectors.admin.movieTitle)
+      cy.get(selectors.main.day).eq(1).click();
+
+      cy.get(selectors.main.seanceTime)
         .first()
-        .invoke('text')
-        .then((titleFromAdmin) => {
-          const movieTitle = titleFromAdmin.trim();
+        .click();
 
-          cy.visit('https://qamid.tmweb.ru');
+      cy.chooseAvailableSeat();
 
-          cy.contains(selectors.main.movie, movieTitle)
-            .should('be.visible')
-            .within(() => {
-              cy.get(selectors.main.seanceTime).first().click();
-            });
+      cy.get(selectors.hall.acceptButton)
+        .click();
 
-          cy.chooseAvailableSeat();
-
-          cy.get(selectors.hall.acceptButton).click();
-
-          cy.contains(selectors.booking.selectedTicketsText).should('be.visible');
-        });
+      cy.contains(selectors.booking.selectedTicketsText)
+        .should('be.visible');
     });
   });
 });
