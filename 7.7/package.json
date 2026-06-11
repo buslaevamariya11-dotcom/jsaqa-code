@@ -6,8 +6,13 @@
   "scripts": {
     "cy:run": "cypress run",
     "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:edge": "cypress run --browser edge",
+    "cy:run:electron": "cypress run --browser electron",
     "cy:record": "cypress run --record",
-    "cy:parallel": "cypress run --record --parallel"
+    "cy:parallel": "cypress run --record --parallel",
+    "cy:folder1": "cypress run --browser chrome --spec \"cypress/e2e/folder1/**/*.cy.js\"",
+    "cy:folder2": "cypress run --browser edge --spec \"cypress/e2e/folder2/**/*.cy.js\"",
+    "cy:folders:parallel": "start cmd /c \"npm run cy:folder1\" && start cmd /c \"npm run cy:folder2\""
   },
   "author": "",
   "license": "ISC",
