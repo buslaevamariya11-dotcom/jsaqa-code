@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cy:run": "cypress run",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:record": "cypress run --record",
+    "cy:parallel": "cypress run --record --parallel"
   },
   "author": "",
   "license": "ISC",
